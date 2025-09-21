@@ -52,14 +52,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
     // Evento principal: Conexión exitosa al unirse
     socket.on('joinSuccess', (data: { user: User; onlineUsers: User[]; recentMessages: Message[] }) => {
-      setOnlineUsers(data.onlineUsers);
+      updateOnlineUsers(data.onlineUsers);
       setMessages(data.recentMessages);
       toast.success('¡Conectado al chat exitosamente!');
     });
 
     // Gestión de usuarios - Lista actualizada
     socket.on('onlineUsers', (users: User[]) => {
-      setOnlineUsers(users);
+      updateOnlineUsers(users);
     });
 
     socket.on('newMessage', (message: Message) => {
@@ -67,7 +67,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     });
 
     socket.on('userJoined', (data: { user: User; onlineUsers: User[] }) => {
-      setOnlineUsers(data.onlineUsers);
+      updateOnlineUsers(data.onlineUsers);
       if (data.user.username !== currentUser.username) {
         toast.success(`${data.user.username} se unió al chat`, {
           icon: '👋',
@@ -76,7 +76,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     });
 
     socket.on('userLeft', (data: { user: User; onlineUsers: User[] }) => {
-      setOnlineUsers(data.onlineUsers);
+      updateOnlineUsers(data.onlineUsers);
       toast(`${data.user.username} abandonó el chat`, {
         icon: '👋',
         duration: 2000
@@ -99,7 +99,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
     // Eventos adicionales que el backend podría estar enviando
     socket.on('usersUpdate', (users: User[]) => {
-      setOnlineUsers(users);
+      updateOnlineUsers(users);
     });
 
     return () => {
@@ -143,6 +143,21 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  // Función para deduplicar usuarios por ID
+  const deduplicateUsers = (users: User[]): User[] => {
+    const uniqueUsers = new Map<string, User>();
+    users.forEach(user => {
+      uniqueUsers.set(user.id, user);
+    });
+    return Array.from(uniqueUsers.values());
+  };
+
+  // Función helper para actualizar usuarios de forma segura
+  const updateOnlineUsers = (users: User[]) => {
+    const uniqueUsers = deduplicateUsers(users);
+    setOnlineUsers(uniqueUsers);
   };
 
   const handleSubmit = (e: React.FormEvent) => {

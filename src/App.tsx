@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import { useSocket } from './hooks/useSocket';
 import { LoginScreen, ChatInterface } from './components';
 
+// const BACKEND_URL = 'http://localhost:5000';
 const BACKEND_URL = 'https://chat-app-backend-1-qylz.onrender.com';
 const CONNECTION_TIMEOUT = 8000; // Reducido a 8 segundos
 

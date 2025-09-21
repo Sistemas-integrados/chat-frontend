@@ -42,7 +42,7 @@ export const UsersList: React.FC<UsersListProps> = ({
                 ) : (
                     users.map((user, index) => (
                         <div
-                            key={user.id}
+                            key={`${user.id}-${index}`}
                             className={`flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 hover:bg-gray-50 ${
                                 user.username === currentUser.username
                                     ? "bg-blue-50 border border-blue-200 shadow-sm"
